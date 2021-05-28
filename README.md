@@ -1,3 +1,12 @@
+# About This Fork
+
+This is a fork of the Marlin 2.0 firmware for use on BigTreeTech motherboard in Creality machines.  
+It is forked from the BugFix branch in order to support some of the newest BTT boards.
+
+I want to thank [Insanity Automation](https://github.com/InsanityAutomation) for 
+sharing their code which helped me with many of the defaults for the creality machines
+and inspired some of the configuration options. 
+
 # Marlin 3D Printer Firmware
 
 ![GitHub](https://img.shields.io/github/license/marlinfirmware/marlin.svg)
