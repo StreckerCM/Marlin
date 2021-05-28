@@ -654,9 +654,9 @@
   #endif
 
   #define CASE_LIGHT_DEFAULT_BRIGHTNESS 255   // Set default power-up brightness (0-255, requires PWM pin)
-  //#define CASE_LIGHT_NO_BRIGHTNESS          // Disable brightness control. Enable for non-PWM lighting.
+  #define CASE_LIGHT_NO_BRIGHTNESS          // Disable brightness control. Enable for non-PWM lighting.
   //#define CASE_LIGHT_MAX_PWM 128            // Limit PWM duty cycle (0-255)
-  //#define CASE_LIGHT_MENU                   // Add Case Light options to the LCD menu
+  #define CASE_LIGHT_MENU                   // Add Case Light options to the LCD menu
   #if ENABLED(NEOPIXEL_LED)
     //#define CASE_LIGHT_USE_NEOPIXEL         // Use NeoPixel LED as case light
   #endif
@@ -1050,10 +1050,13 @@
 // Slow down the machine if the lookahead buffer is (by default) half full.
 // Increase the slowdown divisor for larger buffer sizes.
 #define SLOWDOWN
-#if ENABLED(SLOWDOWN)
+#if ENABLED(SLOWDOWN) 
+  #if ANY(SKRMiniE3V2, SKRE3Turbo) 
+    #define SLOWDOWN_DIVISOR 2
+  #else
     #define SLOWDOWN_DIVISOR 4
+  #endif
 #endif
-
 /**
  * XY Frequency limit
  * Reduce resonance by limiting the frequency of small zigzag infill moves.
@@ -1074,7 +1077,7 @@
 // Backlash Compensation
 // Adds extra movement to axes on direction-changes to account for backlash.
 //
-#if ANY(SKR13, SKR14, SKR14Turbo, SKR20, SKRPRO11)
+#if NONE(SKRMiniE3V2, SKRE3Turbo)
   #define BACKLASH_COMPENSATION
 #endif
 
@@ -1178,7 +1181,7 @@
  * vibration and surface artifacts. The algorithm adapts to provide the best possible step smoothing at the
  * lowest stepping frequencies.
  */
-#if ANY(SKR13, SKR14, SKR14Turbo, SKR20, SKRPRO11)
+#if NONE(SKRMiniE3V2, SKRE3Turbo)
   #define ADAPTIVE_STEP_SMOOTHING
 #endif
 
@@ -1266,8 +1269,9 @@
 // Change values more rapidly when the encoder is rotated faster
 #define ENCODER_RATE_MULTIPLIER
 #if ENABLED(ENCODER_RATE_MULTIPLIER)
-  #define ENCODER_10X_STEPS_PER_SEC   30  // (steps/s) Encoder rate for 10x speed
-  #define ENCODER_100X_STEPS_PER_SEC  80  // (steps/s) Encoder rate for 100x speed
+  #define ENCODER_5X_STEPS_PER_SEC    30    // (steps/s) Encoder rate for 5x speed
+  #define ENCODER_10X_STEPS_PER_SEC   80    // (steps/s) Encoder rate for 10x speed
+  #define ENCODER_100X_STEPS_PER_SEC  130   // (steps/s) Encoder rate for 100x speed
 #endif
 
 // Play a beep when the feedrate is changed from the Status Screen
@@ -1379,7 +1383,7 @@
   #endif
 
   #if EITHER(HAS_MARLINUI_HD44780, IS_TFTGLCD_PANEL)
-    //#define LCD_PROGRESS_BAR            // Show a progress bar on HD44780 LCDs for SD printing
+    #define LCD_PROGRESS_BAR            // Show a progress bar on HD44780 LCDs for SD printing
     #if ENABLED(LCD_PROGRESS_BAR)
       #define PROGRESS_BAR_BAR_TIME 2000  // (ms) Amount of time to show the bar
       #define PROGRESS_BAR_MSG_TIME 3000  // (ms) Amount of time to show the status message
@@ -1449,7 +1453,9 @@
     #define PLR_ENABLED_DEFAULT   false // Power Loss Recovery enabled by default. (Set with 'M413 Sn' & M500)
     //#define BACKUP_POWER_SUPPLY       // Backup power / UPS to move the steppers on power loss
     //#define POWER_LOSS_ZRAISE       2 // (mm) Z axis raise on resume (on power loss with UPS)
-    //#define POWER_LOSS_PIN         44 // Pin to detect power loss. Set to -1 to disable default pin on boards without module.
+    #if ANY(SKR14Turbo, SKR14) && DISABLED(SKR14_PowerLossKit)
+      #define POWER_LOSS_PIN -1
+    #endif
     //#define POWER_LOSS_STATE     HIGH // State of pin indicating power loss
     //#define POWER_LOSS_PULLUP         // Set pullup / pulldown as appropriate for your sensor
     //#define POWER_LOSS_PULLDOWN
@@ -1497,13 +1503,14 @@
     #define SDSORT_LIMIT       40     // Maximum number of sorted items (10-256). Costs 27 bytes each.
     #define FOLDER_SORTING     -1     // -1=above  0=none  1=below
     #define SDSORT_GCODE       false  // Allow turning sorting on/off with LCD and M34 G-code.
-    #define SDSORT_USES_RAM    false  // Pre-allocate a static array for faster pre-sorting.
+    #define SDSORT_USES_RAM    true  // Pre-allocate a static array for faster pre-sorting.
     #define SDSORT_USES_STACK  false  // Prefer the stack for pre-sorting to give back some SRAM. (Negated by next 2 options.)
-    #define SDSORT_CACHE_NAMES false  // Keep sorted items in RAM longer for speedy performance. Most expensive option.
-    #define SDSORT_DYNAMIC_RAM false  // Use dynamic allocation (within SD menus). Least expensive option. Set SDSORT_LIMIT before use!
+    #define SDSORT_CACHE_NAMES true  // Keep sorted items in RAM longer for speedy performance. Most expensive option.
+    #define SDSORT_DYNAMIC_RAM true  // Use dynamic allocation (within SD menus). Least expensive option. Set SDSORT_LIMIT before use!
     #define SDSORT_CACHE_VFATS 2      // Maximum number of 13-byte VFAT entries to use for sorting.
                                       // Note: Only affects SCROLL_LONG_FILENAMES with SDSORT_CACHE_NAMES but not SDSORT_DYNAMIC_RAM.
   #endif
+
 
   // Allow international symbols in long filenames. To display correctly, the
   // LCD's font must contain the characters. Check your selected LCD language.
@@ -1659,7 +1666,7 @@
 
   // A bigger font is available for edit items. Costs 3120 bytes of PROGMEM.
   // Western only. Not available for Cyrillic, Kana, Turkish, Greek, or Chinese.
-  //#define USE_BIG_EDIT_FONT
+  #define USE_BIG_EDIT_FONT
 
   // A smaller font may be used on the Info Screen. Costs 2434 bytes of PROGMEM.
   // Western only. Not available for Cyrillic, Kana, Turkish, Greek, or Chinese.
@@ -1685,7 +1692,9 @@
     // The normal delay is 10µs. Use the lowest value that still gives a reliable display.
     //#define DOGM_SPI_DELAY_US 5
 
-    //#define LIGHTWEIGHT_UI
+    #if ENABLED(Big_UI)
+      #define LIGHTWEIGHT_UI
+    #endif
     #if ENABLED(LIGHTWEIGHT_UI)
       #define STATUS_EXPIRE_SECONDS 20
     #endif
@@ -1718,7 +1727,7 @@
     #define BOOT_MARLIN_LOGO_SMALL    // Show a smaller Marlin logo on the Boot Screen (saving 399 bytes of flash)
   #endif
 
-  #if ANY(SKR13, SKR14, SKR14Turbo, SKR20, SKRPRO11) && ENABLED(EasterBunny)
+  #if NONE(SKRMiniE3V2, SKRE3Turbo) && ENABLED(EasterBunny)
     // Frivolous Game Options
     #define MARLIN_BRICKOUT
     #define MARLIN_INVADERS
@@ -1966,7 +1975,7 @@
 
   #if ENABLED(BABYSTEP_ZPROBE_OFFSET)
     //#define BABYSTEP_HOTEND_Z_OFFSET      // For multiple hotends, babystep relative Z offsets
-    #if NONE(SKRMiniE3V2, MachineEnder3V2) && (DISABLED(MachineEnder4) || ENABLED(GraphicLCD))
+    #if DISABLED(SKRMiniE3V2) && ENABLED(GraphicLCD)
       #define BABYSTEP_ZPROBE_GFX_OVERLAY   // Enable graphical overlay on Z-offset editor
     #endif
   #endif
@@ -2390,7 +2399,7 @@
 #endif
 
 #if ENABLED(FWRETRACT)
-  #define FWRETRACT_AUTORETRACT             // Override slicer retractions
+  //#define FWRETRACT_AUTORETRACT             // Override slicer retractions
   #if ENABLED(FWRETRACT_AUTORETRACT)
     #define MIN_AUTORETRACT             0.1 // (mm) Don't convert E moves under this length
     #define MAX_AUTORETRACT            10.0 // (mm) Don't convert E moves over this length
@@ -2416,9 +2425,11 @@
   // Z raise distance for tool-change, as needed for some extruders
   #define TOOLCHANGE_ZRAISE                 2 // (mm)
   //#define TOOLCHANGE_ZRAISE_BEFORE_RETRACT  // Apply raise before swap retraction (if enabled)
-  //#define TOOLCHANGE_NO_RETURN              // Never return to previous position on tool-change
+  #define TOOLCHANGE_NO_RETURN              // Never return to previous position on tool-change
   #if ENABLED(TOOLCHANGE_NO_RETURN)
-    //#define EVENT_GCODE_AFTER_TOOLCHANGE "G12X"   // Extra G-code to run after tool-change
+    #if ENABLED(PurgeBucket)
+      #define EVENT_GCODE_AFTER_TOOLCHANGE "G12X"   // G-code to run after tool-change is complete
+    #endif
   #endif
 
   /**
@@ -2438,16 +2449,16 @@
    * Retract and prime filament on tool-change to reduce
    * ooze and stringing and to get cleaner transitions.
    */
-  //#define TOOLCHANGE_FILAMENT_SWAP
+  #define TOOLCHANGE_FILAMENT_SWAP
   #if ENABLED(TOOLCHANGE_FILAMENT_SWAP)
     // Load / Unload
-    #define TOOLCHANGE_FS_LENGTH              12  // (mm) Load / Unload length
+    #define TOOLCHANGE_FS_LENGTH              80  // (mm) Load / Unload length
     #define TOOLCHANGE_FS_EXTRA_RESUME_LENGTH  0  // (mm) Extra length for better restart, fine tune by LCD/Gcode)
     #define TOOLCHANGE_FS_RETRACT_SPEED   (50*60) // (mm/min) (Unloading)
     #define TOOLCHANGE_FS_UNRETRACT_SPEED (25*60) // (mm/min) (On SINGLENOZZLE or Bowden loading must be slowed down)
 
     // Longer prime to clean out a SINGLENOZZLE
-    #define TOOLCHANGE_FS_EXTRA_PRIME          0  // (mm) Extra priming length
+    #define TOOLCHANGE_FS_EXTRA_PRIME          2  // (mm) Extra priming length
     #define TOOLCHANGE_FS_PRIME_SPEED    (4.6*60) // (mm/min) Extra priming feedrate
     #define TOOLCHANGE_FS_WIPE_RETRACT         0  // (mm/min) Retract before cooling for less stringing, better wipe, etc.
 
@@ -2482,10 +2493,10 @@
    * Position to park head during tool change.
    * Doesn't apply to SWITCHING_TOOLHEAD, DUAL_X_CARRIAGE, or PARKING_EXTRUDER
    */
-  //#define TOOLCHANGE_PARK
+  #define TOOLCHANGE_PARK
   #if ENABLED(TOOLCHANGE_PARK)
-    #define TOOLCHANGE_PARK_XY    { X_MIN_POS + 10, Y_MIN_POS + 10 }
-    #define TOOLCHANGE_PARK_XY_FEEDRATE 6000  // (mm/min)
+    #define TOOLCHANGE_PARK_XY    { X_MAX_POS, Y_MIN_POS + 10 }
+    #define TOOLCHANGE_PARK_XY_FEEDRATE 6000  // (mm/m)
     //#define TOOLCHANGE_PARK_X_ONLY          // X axis only move
     //#define TOOLCHANGE_PARK_Y_ONLY          // Y axis only move
   #endif
@@ -2502,52 +2513,74 @@
  *
  * Enable PARK_HEAD_ON_PAUSE to add the G-code M125 Pause and Park.
  */
-#if ((ENABLED(SKRMiniE3V2) && DISABLED(POWER_LOSS_RECOVERY)) || DISABLED(SKRMiniE3V2))
+#if DISABLED(SKRMiniE3V2)
   #define ADVANCED_PAUSE_FEATURE
 #endif
 
 #if ENABLED(ADVANCED_PAUSE_FEATURE)
   #define PAUSE_PARK_RETRACT_FEEDRATE         60  // (mm/s) Initial retract feedrate.
-  #define PAUSE_PARK_RETRACT_LENGTH            2  // (mm) Initial retract.
+  #define PAUSE_PARK_RETRACT_LENGTH            4  // (mm) Initial retract.
                                                   // This short retract is done immediately, before parking the nozzle.
-  #define FILAMENT_CHANGE_UNLOAD_FEEDRATE     10  // (mm/s) Unload filament feedrate. This can be pretty fast.
+  #if ANY(MachineCR10SPro, MachineCR10SProV2, MachineCR10Max)
+    #define FILAMENT_CHANGE_UNLOAD_FEEDRATE     20  // (mm/s) Unload filament feedrate. This can be pretty fast.
+  #else
+    #define FILAMENT_CHANGE_UNLOAD_FEEDRATE     40  // (mm/s) Unload filament feedrate. This can be pretty fast.
+  #endif
   #define FILAMENT_CHANGE_UNLOAD_ACCEL        25  // (mm/s^2) Lower acceleration may allow a faster feedrate.
-  #define FILAMENT_CHANGE_UNLOAD_LENGTH      100  // (mm) The length of filament for a complete unload.
+  #if ANY(MachineEnder5Plus, MachineCR10SPro, MachineCR10SProV2)
+    #define FILAMENT_CHANGE_UNLOAD_LENGTH      75
+  #elif ENABLED(DirectDrive)
+    #define FILAMENT_CHANGE_UNLOAD_LENGTH      125
+  #elif ANY(MachineEnder5Plus, MachineCR10Max, MachineCR10S4, MachineCR10S5)
+    #define FILAMENT_CHANGE_UNLOAD_LENGTH   700
+  #else
+    #define FILAMENT_CHANGE_UNLOAD_LENGTH      430  // (mm) The length of filament for a complete unload.
+  #endif
                                                   //   For Bowden, the full length of the tube and nozzle.
                                                   //   For direct drive, the full length of the nozzle.
                                                   //   Set to 0 for manual unloading.
   #define FILAMENT_CHANGE_SLOW_LOAD_FEEDRATE   6  // (mm/s) Slow move when starting load.
   #define FILAMENT_CHANGE_SLOW_LOAD_LENGTH     0  // (mm) Slow length, to allow time to insert material.
                                                   // 0 to disable start loading and skip to fast load only
-  #define FILAMENT_CHANGE_FAST_LOAD_FEEDRATE   6  // (mm/s) Load filament feedrate. This can be pretty fast.
-  #define FILAMENT_CHANGE_FAST_LOAD_ACCEL     25  // (mm/s^2) Lower acceleration may allow a faster feedrate.
-  #define FILAMENT_CHANGE_FAST_LOAD_LENGTH     0  // (mm) Load length of filament, from extruder gear to nozzle.
+  #define FILAMENT_CHANGE_FAST_LOAD_FEEDRATE  20  // (mm/s) Load filament feedrate. This can be pretty fast.
+  #define FILAMENT_CHANGE_FAST_LOAD_ACCEL     15  // (mm/s^2) Lower acceleration may allow a faster feedrate.
+
+  #if ENABLED(DirectDrive)
+    #define FILAMENT_CHANGE_FAST_LOAD_LENGTH   100
+  #elif(ENABLED(MachineCRX))
+    #define FILAMENT_CHANGE_FAST_LOAD_LENGTH   450  // (mm) Load length of filament, from extruder gear to nozzle.
+  #elif ANY(MachineEnder5Plus, MachineCR10Max, MachineCR10S4, MachineCR10S5)
+    #define FILAMENT_CHANGE_FAST_LOAD_LENGTH   600
+  #else
+    #define FILAMENT_CHANGE_FAST_LOAD_LENGTH   430  // (mm) Load length of filament, from extruder gear to nozzle.
+  #endif
                                                   //   For Bowden, the full length of the tube and nozzle.
                                                   //   For direct drive, the full length of the nozzle.
   //#define ADVANCED_PAUSE_CONTINUOUS_PURGE       // Purge continuously up to the purge length until interrupted.
   #define ADVANCED_PAUSE_PURGE_FEEDRATE        3  // (mm/s) Extrude feedrate (after loading). Should be slower than load feedrate.
-  #define ADVANCED_PAUSE_PURGE_LENGTH         50  // (mm) Length to extrude after loading.
+  #define ADVANCED_PAUSE_PURGE_LENGTH         20  // (mm) Length to extrude after loading.
                                                   //   Set to 0 for manual extrusion.
                                                   //   Filament can be extruded repeatedly from the Filament Change menu
                                                   //   until extrusion is consistent, and to purge old filament.
   #define ADVANCED_PAUSE_RESUME_PRIME          0  // (mm) Extra distance to prime nozzle after returning from park.
-  //#define ADVANCED_PAUSE_FANS_PAUSE             // Turn off print-cooling fans while the machine is paused.
+  #define ADVANCED_PAUSE_FANS_PAUSE             // Turn off print-cooling fans while the machine is paused.
 
                                                   // Filament Unload does a Retract, Delay, and Purge first:
-  #define FILAMENT_UNLOAD_PURGE_RETRACT       13  // (mm) Unload initial retract length.
+  #define FILAMENT_UNLOAD_PURGE_RETRACT        4  // (mm) Unload initial retract length.
   #define FILAMENT_UNLOAD_PURGE_DELAY       5000  // (ms) Delay for the filament to cool after retract.
-  #define FILAMENT_UNLOAD_PURGE_LENGTH         8  // (mm) An unretract is done, then this length is purged.
+  #define FILAMENT_UNLOAD_PURGE_LENGTH         0  // (mm) An unretract is done, then this length is purged.
   #define FILAMENT_UNLOAD_PURGE_FEEDRATE      25  // (mm/s) feedrate to purge before unload
 
   #define PAUSE_PARK_NOZZLE_TIMEOUT           45  // (seconds) Time limit before the nozzle is turned off for safety.
-  #define FILAMENT_CHANGE_ALERT_BEEPS         10  // Number of alert beeps to play when a response is needed.
+  #define FILAMENT_CHANGE_ALERT_BEEPS          2  // Number of alert beeps to play when a response is needed.
   #define PAUSE_PARK_NO_STEPPER_TIMEOUT           // Enable for XYZ steppers to stay powered on during filament change.
 
-  //#define PARK_HEAD_ON_PAUSE                    // Park the nozzle during pause and filament change.
-  //#define HOME_BEFORE_FILAMENT_CHANGE           // If needed, home before parking for filament change
-
-  //#define FILAMENT_LOAD_UNLOAD_GCODES           // Add M701/M702 Load/Unload G-codes, plus Load/Unload in the LCD Prepare menu.
-  //#define FILAMENT_UNLOAD_ALL_EXTRUDERS         // Allow M702 to unload all extruders above a minimum target temp (as set by M302)
+  #define PARK_HEAD_ON_PAUSE                      // Park the nozzle during pause and filament change.
+  //#define HOME_BEFORE_FILAMENT_CHANGE             // Ensure homing has been completed prior to parking for filament change
+  #if NONE(MachineCR10Orig, MachineEnder4, SKRMiniE3V2)
+    #define FILAMENT_LOAD_UNLOAD_GCODES           // Add M701/M702 Load/Unload G-codes, plus Load/Unload in the LCD Prepare menu.
+    #define FILAMENT_UNLOAD_ALL_EXTRUDERS         // Allow M702 to unload all extruders above a minimum target temp (as set by M302)
+  #endif
 #endif
 
 // @section tmc
@@ -3817,8 +3850,13 @@
 #endif
 
 // Support for MeatPack G-code compression (https://github.com/scottmudge/OctoPrint-MeatPack)
-//#define MEATPACK_ON_SERIAL_PORT_1
-//#define MEATPACK_ON_SERIAL_PORT_2
+#if ENABLED(MeatPackForOctoPi)
+  #if ENABLED(SKR20)
+    #define MEATPACK_ON_SERIAL_PORT_2
+  #else
+    #define MEATPACK_ON_SERIAL_PORT_1
+  #endif
+#endif
 
 //#define GCODE_CASE_INSENSITIVE  // Accept G-code sent to the firmware in lowercase
 
@@ -3845,6 +3883,12 @@
  * Execute certain G-code commands immediately after power-on.
  */
 //#define STARTUP_COMMANDS "M17 Z"
+#if ENABLED(DualZ)
+  #define CmdVar1 "G34"
+#endif
+
+
+#define STARTUP_COMMANDS CmdVar1
 
 /**
  * G-code Macros
@@ -3852,7 +3896,7 @@
  * Add G-codes M810-M819 to define and run G-code macros.
  * Macros are not saved to EEPROM.
  */
-#if DISABLED(SKRMiniE3V2)
+#if NONE(SKRMiniE3V2, SKRE3Turbo)
   #define GCODE_MACROS
 #endif
 
@@ -4391,7 +4435,7 @@
 //
 // M43 - display pin status, toggle pins, watch pins, watch endstops & toggle LED, test servo probe
 //
-#if DISABLED(SKRMiniE3V2)
+#if NONE(SKRMiniE3V2, SKRE3Turbo)
   #define PINS_DEBUGGING
 #endif
 

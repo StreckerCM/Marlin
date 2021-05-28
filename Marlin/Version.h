@@ -28,25 +28,135 @@
 /**
  * Marlin release version identifier
  */
-//#define SHORT_BUILD_VERSION "bugfix-2.0.x"
+#define SHORT_BUILD_VERSION "2.0.8_BTT_BF_1.5"
 
 /**
  * Verbose version identifier which should contain a reference to the location
  * from where the binary was downloaded or the source code was compiled.
  */
-//#define DETAILED_BUILD_VERSION SHORT_BUILD_VERSION
+#if(ENABLED(MachineMini))
+    #define VerChar1 "M"
+#elif(ENABLED(MachineEnder2))
+    #define VerChar1 "E2"
+#elif(ENABLED(MachineEnder3))
+    #define VerChar1 "E3"
+#elif ENABLED(MachineEnder3V2)
+  #define VerChar1 "E3V2"
+#elif(ENABLED(MachineEnder4))
+    #define VerChar1 "E4"
+#elif(ENABLED(MachineEnder5))
+    #define VerChar1 "E5"
+#elif(ENABLED(MachineEnder5Plus))
+    #define VerChar1 "E5P"
+#elif(ENABLED(MachineCR20))
+    #define VerChar1 "2"
+#elif(ENABLED(MachineCR10Orig))
+    #define VerChar1 "O"
+#elif(ENABLED(MachineCR10Std))
+    #define VerChar1 "S"
+#elif(ENABLED(MachineCRX))
+    #define VerChar1 "X"
+#elif(ENABLED(MachineS4))
+    #define VerChar1 "4"
+#elif(ENABLED(MachineS5) || ENABLED(MachineCR10Max))
+    #define VerChar1 "5"
+#elif ENABLED(MachineCR2020)
+  #define VerChar1 "20"
+#endif
+
+#if ENABLED(HotendStock)
+    #define VerChar2 "S"
+#elif ENABLED(HotendE3D)
+    #define VerChar2 "E"
+#elif ENABLED(HotendMosquito)
+    #define VerChar2 "M"
+#elif ENABLED(HotendCopperhead)
+    #define VerChar2 "C"
+#elif ENABLED(HotendBIQU_H2)
+    #define VerChar2 "H"
+#endif
+
+#if ENABLED(HotendAllMetal)
+    #define VerChar3 "M"
+#else
+    #define VerChar3 "S"
+#endif
+
+#if(ENABLED(BedAC))
+    #define VerChar4 "A"
+#elif(ENABLED(BedDC))
+    #define VerChar4 "D"
+#else
+    #define VerChar4 "N"
+#endif
+
+#if(ENABLED(ABL_EZABL))
+    #define VerChar5 "A"
+#elif(ENABLED(ABL_BLTOUCH))
+    #define VerChar5 "B"
+#else
+    #define VerChar5 "N"
+#endif
+
+#if(ENABLED(ABL_UBL))
+    #define VerChar6 "U"
+#elif(ENABLED(ABL_BI))
+    #define VerChar6 "B"
+#else
+    #define VerChar6 "N"
+#endif
+
+#define DETAILED_BUILD_VERSION SHORT_BUILD_VERSION " CMS " VerChar1 VerChar2 VerChar3 VerChar4 VerChar5 VerChar6
 
 /**
  * The STRING_DISTRIBUTION_DATE represents when the binary file was built,
  * here we define this default string as the date where the latest release
  * version was tagged.
  */
-//#define STRING_DISTRIBUTION_DATE "2021-07-09"
+#define STRING_DISTRIBUTION_DATE "2021-05-27"
 
 /**
  * Defines a generic printer name to be output to the LCD after booting Marlin.
  */
-//#define MACHINE_NAME "3D Printer"
+#if(ENABLED(MachineMini))
+    #define CUSTOM_MACHINE_NAME "CR-10 Mini"
+#elif(ENABLED(MachineEnder2))
+    #define CUSTOM_MACHINE_NAME "Ender 2"
+#elif(ENABLED(MachineEnder3))
+    #define CUSTOM_MACHINE_NAME "Ender 3"
+#elif(ENABLED(MachineEnder3V2))
+    #define CUSTOM_MACHINE_NAME "Ender 3 V2"
+#elif(ENABLED(MachineEnder4))
+    #define CUSTOM_MACHINE_NAME "Ender 4"
+#elif(ENABLED(MachineEnder5))
+    #define CUSTOM_MACHINE_NAME "Ender 5"
+#elif(ENABLED(MachineEnder5Plus))
+    #define CUSTOM_MACHINE_NAME "Ender 5 Plus"
+#elif(ENABLED(MachineCR20))
+    #define CUSTOM_MACHINE_NAME "CR-20"
+#elif(ENABLED(MachineCR10Orig))
+    #define CUSTOM_MACHINE_NAME "CR-10"
+#elif(ENABLED(MachineCRX))
+    #define CUSTOM_MACHINE_NAME "CR-X"
+#elif ENABLED(MachineCR10SProV2)
+  #define CUSTOM_MACHINE_NAME "CR-10S Pro V2"
+#elif(ENABLED(MachineCR10SPro))
+    #define CUSTOM_MACHINE_NAME "CR-10S Pro"
+#elif(ENABLED(MachineCR10Max))
+    #define CUSTOM_MACHINE_NAME "CR-10 MAX"
+#elif(ENABLED(MachineCR10SV2))
+    #define CUSTOM_MACHINE_NAME "CR-10 V2"
+#elif(ENABLED(MachineCR10Std))
+    #define CUSTOM_MACHINE_NAME "CR-10S"
+#elif(ENABLED(MachineS4))
+    #define CUSTOM_MACHINE_NAME "CR-10S S4"
+#elif(ENABLED(MachineS5))
+    #define CUSTOM_MACHINE_NAME "CR-10S S5"
+#elif ENABLED(MachineCR2020)
+  #define CUSTOM_MACHINE_NAME "CR-2020"
+#elif ENABLED(MachineHICTOPi3)
+    #define CUSTOM_MACHINE_NAME "HICTOP i3"
+#endif
 
 /**
  * The SOURCE_CODE_URL is the location where users will find the Marlin Source
@@ -54,7 +164,7 @@
  * has a distinct Github fork— the Source Code URL should just be the main
  * Marlin repository.
  */
-//#define SOURCE_CODE_URL "github.com/MarlinFirmware/Marlin"
+#define SOURCE_CODE_URL "https://github.com/StreckerCM/Marlin"
 
 /**
  * Default generic printer UUID.
@@ -65,7 +175,7 @@
  * The WEBSITE_URL is the location where users can get more information such as
  * documentation about a specific Marlin release.
  */
-//#define WEBSITE_URL "marlinfw.org"
+#define WEBSITE_URL "marlinfw.org"
 
 /**
  * Set the vendor info the serial USB interface, if changable

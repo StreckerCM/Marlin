@@ -6,7 +6,20 @@
    @Build Section - Machine
 */
 
-#define MachineCR10SPro
+//#define MachineEnder5Plus
+//#define MachineEnder4
+//#define MachineCR20 //Buzzer doesnt work
+//#define MachineCR20Pro
+//#define MachineCR10S
+//#define MachineCR10SV2
+#define MachineCR10SPro // Graphics LCD Requires soldering R64 and R66
+//#define MachineCR10SProV2 // Second Gen 10S Pro with BLTouch wired to Z Max
+//#define MachineCRX
+//#define MachineCRXPro
+//#define MachineCR10Max
+//#define MachineS4
+//#define MachineS5
+//#define MachineCR2020 // Industrial Series 2020
 //#define MachineHICTOPi3
 
 /*
@@ -16,9 +29,9 @@
 #ifndef MOTHERBOARD
   //#define MOTHERBOARD BOARD_BTT_SKR_V1_3
   //#define MOTHERBOARD BOARD_BTT_SKR_V1_4
-  //#define MOTHERBOARD BOARD_BTT_SKR_V1_4_TURBO
-  //#define MOTHERBOARD BTT_SKR_V2_0_REV_B
-  #define MOTHERBOARD BTT_SKR_V2_0_REV_B
+  #define MOTHERBOARD BOARD_BTT_SKR_V1_4_TURBO
+  //#define MOTHERBOARD BOARD_BTT_SKR_V2_0_REV_A
+  //#define MOTHERBOARD BOARD_BTT_SKR_V2_0_REV_B
   //#define MOTHERBOARD BOARD_BTT_SKR_PRO_V1_1
   //#define MOTHERBOARD BOARD_BTT_SKR_MINI_E3_V2_0
   //#define MOTHERBOARD BOARD_BTT_SKR_E3_TURBO
@@ -32,7 +45,7 @@
 //#define HotendE3D
 #define HotendCopperhead
 //#define HotendMosquito
-//#define HotendBIQU_H2AllMetal
+//#define HotendBIQU_H2  // If using an all metal heatbreak also uncomment #define HotendAllMetal
 
 /*
    @Build Section - Thermals
@@ -41,6 +54,7 @@
 #define SlicePT1000 // Enable this if you have a mosquito with the newer PT1000 sensor
 #define PID50W //Set PID for 50W Heater
 #define AutomaticHotendFan //Use PMW fan (or spare hotend pin) to turn off the hotend fan when it is not heating
+//#define HotendAllMetal
 
 /*
    @Build Section - Extruder Type
@@ -134,6 +148,7 @@
 #define DualZ // Uses 5th driver on CRX or SKR boards as Z2
 #define TwoAmpY //Increase the Y motor current for a 2 Amp stepper
 //#define SensorlessHomingXY  // Enable sensorless homing for X and Y axis with StallGuard capable drivers only
+//#define Stepper09Deg // 0.9 degree per step motor on the extruder - doubles ESteps
 
 /*
    @Build Section - Enclosure Controls
@@ -156,7 +171,8 @@
    @Build Section - Misc
 */
 //#define UnstableTemps // define if temps are unstable and you need a temporary workaround
-#define OptimizeForOctoPi
+#define OptimizeForOctoPi 
+#define MeatPackForOctoPi
 //#define EasterBunny
 //#define TwelveVoltPSU
 
@@ -214,7 +230,7 @@
   #define SKR14
 #elif MOTHERBOARD == BOARD_BTT_SKR_V1_4_TURBO
   #define SKR14Turbo
-#elif  MOTHERBOARD == BOARD_BTT_SKR_V2_0
+#elif  MOTHERBOARD == BOARD_BTT_SKR_V2_0 || MOTHERBOARD == BOARD_BTT_SKR_V2_0_REV_A || MOTHERBOARD == BOARD_BTT_SKR_V2_0_REV_B
   #define SKR20
 #elif MOTHERBOARD == BOARD_BTT_SKR_PRO_V1_1
   #define SKRPRO11
@@ -262,8 +278,12 @@
   #endif
 #endif
 
-#if NONE(HotendStock, HotendE3D, HotendCopperhead, HotendMosquito, HotendBIQU_H2AllMetal)
+#if NONE(HotendStock, HotendE3D, HotendCopperhead, HotendMosquito, HotendBIQU_H2)
   #define HotendStock
+#else
+  #ifndef HotendAllMetal
+    #define HotendAllMetal
+  #endif
 #endif
 
 #if ANY(ABL_EZABL, ABL_NCSW, ABL_BLTOUCH, ABL_TOUCH_MI) && NONE(ABL_UBL, ABL_BI)
@@ -274,10 +294,14 @@
   #define MeshStd
 #endif
 
-#if MOTHERBOARD == BOARD_BTT_SKR_PRO_V1_1
+#if ENABLED(SKRPRO11)
   #define FIL_RUNOUT_PIN   PE15
-  #if DISABLED(I2C_EEPROM)
-    #define FLASH_EEPROM_EMULATION
+#endif
+
+#if DISABLED(I2C_EEPROM)
+  #define FLASH_EEPROM_EMULATION
+  #if ENABLED(SKR20)
+    #define FLASH_EEPROM_LEVELING
   #endif
 #endif
 
@@ -354,8 +378,11 @@
  *
  * :[-1, 0, 1, 2, 3, 4, 5, 6, 7]
  */
-#define SERIAL_PORT -1
-
+#if ENABLED(SKR20)
+  #define SERIAL_PORT 1
+#else
+  #define SERIAL_PORT -1
+#endif
 /**
  * Serial Port Baud Rate
  * This is the default communication speed for all serial ports.
@@ -375,7 +402,14 @@
  * Currently Ethernet (-2) is only supported on Teensy 4.1 boards.
  * :[-2, -1, 0, 1, 2, 3, 4, 5, 6, 7]
  */
-#define SERIAL_PORT_2 0
+#if ENABLED(SKR20)
+  #define SERIAL_PORT_2 -1
+#elif ENABLED(SKRMiniE3V2)
+  #define SERIAL_PORT_2 2
+#else
+  #define SERIAL_PORT_2 0
+#endif
+
 //#define BAUDRATE_2 250000   // Enable to override BAUDRATE
 
 /**
@@ -1236,34 +1270,34 @@
  * :['A4988', 'A5984', 'DRV8825', 'LV8729', 'L6470', 'L6474', 'POWERSTEP01', 'TB6560', 'TB6600', 'TMC2100', 'TMC2130', 'TMC2130_STANDALONE', 'TMC2160', 'TMC2160_STANDALONE', 'TMC2208', 'TMC2208_STANDALONE', 'TMC2209', 'TMC2209_STANDALONE', 'TMC26X', 'TMC26X_STANDALONE', 'TMC2660', 'TMC2660_STANDALONE', 'TMC5130', 'TMC5130_STANDALONE', 'TMC5160', 'TMC5160_STANDALONE']
  */
  #if ENABLED(SKR_2209)
-    #define X_DRIVER_TYPE  TMC2209_STANDALONE
-    #define Y_DRIVER_TYPE  TMC2209_STANDALONE
-    #define Z_DRIVER_TYPE  TMC2209_STANDALONE
-    #define E0_DRIVER_TYPE TMC2209_STANDALONE
+    #define X_DRIVER_TYPE  TMC2209
+    #define Y_DRIVER_TYPE  TMC2209
+    #define Z_DRIVER_TYPE  TMC2209
+    #define E0_DRIVER_TYPE TMC2209
     #if ENABLED(DualZ)
-      #define Z2_DRIVER_TYPE TMC2209_STANDALONE
+      #define Z2_DRIVER_TYPE TMC2209
     #else
-      #define E1_DRIVER_TYPE TMC2209_STANDALONE
+      #define E1_DRIVER_TYPE TMC2209
     #endif
   #elif ENABLED(SKR_2130)
-    #define X_DRIVER_TYPE  TMC2130_STANDALONE
-    #define Y_DRIVER_TYPE  TMC2130_STANDALONE
-    #define Z_DRIVER_TYPE  TMC2130_STANDALONE
-    #define E0_DRIVER_TYPE TMC2130_STANDALONE
+    #define X_DRIVER_TYPE  TMC2130
+    #define Y_DRIVER_TYPE  TMC2130
+    #define Z_DRIVER_TYPE  TMC2130
+    #define E0_DRIVER_TYPE TMC2130
     #if ENABLED(DualZ)
-      #define Z2_DRIVER_TYPE TMC2130_STANDALONE
+      #define Z2_DRIVER_TYPE TMC2130
     #else
-      #define E1_DRIVER_TYPE TMC2130_STANDALONE
+      #define E1_DRIVER_TYPE TMC2130
     #endif
   #else
-    #define X_DRIVER_TYPE  TMC2208_STANDALONE
-    #define Y_DRIVER_TYPE  TMC2208_STANDALONE
-    #define Z_DRIVER_TYPE  TMC2208_STANDALONE
-    #define E0_DRIVER_TYPE TMC2208_STANDALONE
+    #define X_DRIVER_TYPE  TMC2208E
+    #define Y_DRIVER_TYPE  TMC2208E
+    #define Z_DRIVER_TYPE  TMC2208E
+    #define E0_DRIVER_TYPE TMC2208E
     #if ENABLED(DualZ)
-      #define Z2_DRIVER_TYPE TMC2208_STANDALONE
+      #define Z2_DRIVER_TYPE TMC2208E
     #else
-      #define E1_DRIVER_TYPE TMC2208_STANDALONE
+      #define E1_DRIVER_TYPE TMC2208E
     #endif
   #endif
 
@@ -1318,7 +1352,7 @@
   #define EStepsmm 130
 #elif(ENABLED(Bondtech) || ENABLED(E3DTitan))
   #define EStepsmm 415
-#elif ENABLED(HotendBIQU_H2)
+#elif ENABLED(BIQU_H2)
   #define EStepsmm 982.66  //Default is 932
 #elif ENABLED(E3DHemera)
   #define EStepsmm 409
@@ -1427,7 +1461,7 @@
 
 //#define LIMITED_MAX_FR_EDITING        // Limit edit via M203 or LCD to DEFAULT_MAX_FEEDRATE * 2
 #if ENABLED(LIMITED_MAX_FR_EDITING)
-  #define MAX_FEEDRATE_EDIT_VALUES    { 600, 600, 10, 50 } // ...or, set your own edit limits
+  #define MAX_FEEDRATE_EDIT_VALUES    { 1000, 1000, 25, 150 } // ...or, set your own edit limits
 #endif
 
 /**
@@ -1440,7 +1474,7 @@
 
 //#define LIMITED_MAX_ACCEL_EDITING     // Limit edit via M201 or LCD to DEFAULT_MAX_ACCELERATION * 2
 #if ENABLED(LIMITED_MAX_ACCEL_EDITING)
-  #define MAX_ACCEL_EDIT_VALUES       { 6000, 6000, 200, 20000 } // ...or, set your own edit limits
+  #define MAX_ACCEL_EDIT_VALUES       { 2000, 2000, 250, 500 } // ...or, set your own edit limits
 #endif
 
 /**
@@ -1466,7 +1500,7 @@
 #define CLASSIC_JERK
 #if ENABLED(CLASSIC_JERK)
   #define DEFAULT_XJERK 10.0
-  #define DEFAULT_YJERK 10.0
+  #define DEFAULT_YJERK 5.0
   #define DEFAULT_ZJERK  0.3
   //#define DEFAULT_IJERK  0.3
   //#define DEFAULT_JJERK  0.3
@@ -1503,8 +1537,9 @@
  *
  * See https://github.com/synthetos/TinyG/wiki/Jerk-Controlled-Motion-Explained
  */
-#define S_CURVE_ACCELERATION
-
+#if NONE(SKRMiniE3V2)
+  #define S_CURVE_ACCELERATION
+#endif
 //===========================================================================
 //============================= Z Probe Options =============================
 //===========================================================================
@@ -1843,11 +1878,11 @@
   #define Z_AFTER_PROBING           5 // Z position after probing is done
 #endif
 
-#define Z_PROBE_LOW_POINT          -2 // Farthest distance below the trigger-point to go before stopping
+#define Z_PROBE_LOW_POINT          -3 // Farthest distance below the trigger-point to go before stopping
 
 // For M851 give a range for adjusting the Z probe offset
-#define Z_PROBE_OFFSET_RANGE_MIN -20
-#define Z_PROBE_OFFSET_RANGE_MAX 20
+#define Z_PROBE_OFFSET_RANGE_MIN -9
+#define Z_PROBE_OFFSET_RANGE_MAX 9
 
 // Enable the M48 repeatability test to test probe accuracy
 #if ANY(ABL_EZABL, ABL_BLTOUCH, ABL_NCSW, ABL_TOUCH_MI) && NONE(SKRMiniE3V2, SKRE3Turbo)
@@ -1952,7 +1987,7 @@
   #define INVERT_X_DIR true
   #define INVERT_Y_DIR true
   #define INVERT_Z_DIR false
-  #if ENABLED(HotendBIQU_H2)
+  #if ENABLED(BIQU_H2)
     #define INVERT_E0_DIR true
   #else
     #define INVERT_E0_DIR false
@@ -2176,6 +2211,14 @@
 #elif ENABLED(MachineHICTOPi3)
   #define X_MIN_POS 0
   #define Y_MIN_POS -13
+// #elif ANY(MachineCR10SPro, MachineCR10SProV2)
+//     #if ENABLED(KitFunssor_CR10S_Pro_Y_Axis)
+//       #define X_MIN_POS 0
+//       #define Y_MIN_POS -15
+//     #else
+//       #define X_MIN_POS 0
+//       #define Y_MIN_POS 0
+//     #endif
 #else
   #define X_MIN_POS 0
   #define Y_MIN_POS 0
@@ -2221,7 +2264,7 @@
 #endif
 
 #if EITHER(MIN_SOFTWARE_ENDSTOPS, MAX_SOFTWARE_ENDSTOPS)
-  //#define SOFT_ENDSTOPS_MENU_ITEM  // Enable/Disable software endstops from the LCD
+  #define SOFT_ENDSTOPS_MENU_ITEM  // Enable/Disable software endstops from the LCD
 #endif
 
 /**
@@ -2408,9 +2451,11 @@
   // Gradually reduce leveling correction until a set height is reached,
   // at which point movement will be level to the machine's XY plane.
   // The height can be set with M420 Z<height>
-  #define ENABLE_LEVELING_FADE_HEIGHT
-  #if ENABLED(ENABLE_LEVELING_FADE_HEIGHT)
-    #define DEFAULT_LEVELING_FADE_HEIGHT 10.0 // (mm) Default fade height.
+  #if NONE(SKRMiniE3V2)
+    #define ENABLE_LEVELING_FADE_HEIGHT
+    #if ENABLED(ENABLE_LEVELING_FADE_HEIGHT)
+      #define DEFAULT_LEVELING_FADE_HEIGHT 0.0 // (mm) Default fade height.
+    #endif
   #endif
 
   // For Cartesian machines, instead of dividing moves on mesh boundaries,
@@ -2471,7 +2516,7 @@
 
     // Beyond the probed grid, continue the implied tilt?
     // Default is to maintain the height of the nearest edge.
-    //#define EXTRAPOLATE_BEYOND_GRID
+    #define EXTRAPOLATE_BEYOND_GRID
 
     //
     // Experimental Subdivision of the grid by Catmull-Rom method.
@@ -2491,7 +2536,9 @@
   //========================= Unified Bed Leveling ============================
   //===========================================================================
 
-  //#define MESH_EDIT_GFX_OVERLAY   // Display a graphics overlay while editing the mesh
+  #if ENABLED(GraphicLCD)
+    #define MESH_EDIT_GFX_OVERLAY   // Display a graphics overlay while editing the mesh
+  #endif
 
   #define MESH_INSET 1              // Set Mesh bounds as an inset region of the bed
   //#define GRID_MAX_POINTS_X 10      // Don't use more than 15 points per axis, implementation limited.
@@ -2764,12 +2811,16 @@
 
 #if ENABLED(NOZZLE_PARK_FEATURE)
   // Specify a park position as { X, Y, Z_raise }
-  #define NOZZLE_PARK_POINT { (X_MIN_POS + 10), (Y_MAX_POS - 10), 20 }
+  #if(ENABLED(MachineEnder2))
+    #define NOZZLE_PARK_POINT { (0), (0), 10 }
+  #else
+    #define NOZZLE_PARK_POINT { (50), (10), 10 }
+  #endif
   //#define NOZZLE_PARK_X_ONLY          // X move only is required to park
   //#define NOZZLE_PARK_Y_ONLY          // Y move only is required to park
-  #define NOZZLE_PARK_Z_RAISE_MIN   2   // (mm) Always raise Z by at least this distance
-  #define NOZZLE_PARK_XY_FEEDRATE 100   // (mm/s) X and Y axes feedrate (also used for delta Z axis)
-  #define NOZZLE_PARK_Z_FEEDRATE    5   // (mm/s) Z axis feedrate (not used for delta printers)
+  #define NOZZLE_PARK_Z_RAISE_MIN    2  // (mm) Always raise Z by at least this distance
+#define NOZZLE_PARK_XY_FEEDRATE     50  // X and Y axes feedrate in mm/s (also used for delta printers Z axis)
+#define NOZZLE_PARK_Z_FEEDRATE       5  // Z axis feedrate in mm/s (not used for delta printers)
 #endif
 
 /**
@@ -2889,7 +2940,7 @@
  *
  * View the current statistics with M78.
  */
-#if DISABLED(SKRMiniE3V2)
+#if DISABLED(SKRMiniE3V2) && ENABLED(I2C_EEPROM)
   #define PRINTCOUNTER
   #if ENABLED(PRINTCOUNTER)
     #define PRINTCOUNTER_SAVE_INTERVAL 60 // (minutes) EEPROM save interval during print
@@ -2997,8 +3048,10 @@
  * Disable all menus and only display the Status Screen, or
  * just remove some extraneous menu items to recover space.
  */
-//#define NO_LCD_MENUS
-//#define SLIM_LCD_MENUS
+#if ENABLED(SKRMiniE3V2)
+  //#define NO_LCD_MENUS
+  #define SLIM_LCD_MENUS
+#endif
 
 //
 // ENCODER SETTINGS
