@@ -3883,12 +3883,14 @@
  * Execute certain G-code commands immediately after power-on.
  */
 //#define STARTUP_COMMANDS "M17 Z"
-#if ENABLED(DualZ)
-  #define CmdVar1 "G34"
+#if DISABLED(OptimizeForOctoPi)
+  #if ENABLED(DualZ)
+    //Auto Z Stepper Align
+    #define STARTUP_COMMANDS "G34"
+  #else
+    #define STARTUP_COMMANDS ""
+  #endif
 #endif
-
-
-#define STARTUP_COMMANDS CmdVar1
 
 /**
  * G-code Macros
