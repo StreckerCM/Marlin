@@ -29,9 +29,9 @@
 #ifndef MOTHERBOARD
   //#define MOTHERBOARD BOARD_BTT_SKR_V1_3
   //#define MOTHERBOARD BOARD_BTT_SKR_V1_4
-  #define MOTHERBOARD BOARD_BTT_SKR_V1_4_TURBO
+  //#define MOTHERBOARD BOARD_BTT_SKR_V1_4_TURBO
   //#define MOTHERBOARD BOARD_BTT_SKR_V2_0_REV_A
-  //#define MOTHERBOARD BOARD_BTT_SKR_V2_0_REV_B
+  #define MOTHERBOARD BOARD_BTT_SKR_V2_0_REV_B
   //#define MOTHERBOARD BOARD_BTT_SKR_PRO_V1_1
   //#define MOTHERBOARD BOARD_BTT_SKR_MINI_E3_V2_0
   //#define MOTHERBOARD BOARD_BTT_SKR_E3_TURBO
@@ -168,6 +168,13 @@
 #define KitFunssor_CR10S_Pro_Y_Axis
 
 /*
+   @Build Section - EEPROM
+*/
+#define I2C_EEPROM
+#define E2END 0x7FFF //32Kb
+//#define E2END 0xFFFF //64Kb
+
+/*
    @Build Section - Misc
 */
 //#define UnstableTemps // define if temps are unstable and you need a temporary workaround
@@ -175,6 +182,7 @@
 #define MeatPackForOctoPi
 //#define EasterBunny
 //#define TwelveVoltPSU
+
 
 //===========================================================================
 //====================== End User Build Customizations ======================
@@ -296,6 +304,11 @@
 
 #if ENABLED(SKRPRO11)
   #define FIL_RUNOUT_PIN   PE15
+#endif
+
+#ifdef I2C_EEPROM
+  #undef MARLIN_EEPROM_SIZE
+  #define MARLIN_EEPROM_SIZE E2END 
 #endif
 
 #if DISABLED(I2C_EEPROM)
@@ -2138,7 +2151,7 @@
     #define X_BED_SIZE 300
     #define Y_BED_SIZE 300
     #if ENABLED(KitFunssor_CR10S_Pro_Y_Axis)
-      #define Z_MAX_POS 360
+      #define Z_MAX_POS 385
     #else
       #define Z_MAX_POS 400
     #endif

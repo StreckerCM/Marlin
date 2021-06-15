@@ -608,7 +608,14 @@
 #define E6_AUTO_FAN_PIN -1
 #define E7_AUTO_FAN_PIN -1
 #define CHAMBER_AUTO_FAN_PIN -1
-#define COOLER_AUTO_FAN_PIN -1
+#if ENABLED(SKR20) 
+    #undef COOLER_AUTO_FAN_PIN
+    #undef FAN2_PIN
+    #define COOLER_AUTO_FAN_PIN PB5 //Fan 2
+#else
+  #define COOLER_AUTO_FAN_PIN -1
+#endif
+
 #define COOLER_FAN_PIN -1
 
 #define EXTRUDER_AUTO_FAN_TEMPERATURE 50
@@ -1952,7 +1959,7 @@
   //#define BABYSTEP_XY                     // Also enable X/Y Babystepping. Not supported on DELTA!
   #define BABYSTEP_INVERT_Z false           // Change if Z babysteps should go the other way
   //#define BABYSTEP_MILLIMETER_UNITS       // Specify BABYSTEP_MULTIPLICATOR_(XY|Z) in mm instead of micro-steps
-  #define BABYSTEP_MULTIPLICATOR_Z  10       // (steps or mm) Steps or millimeter distance for each Z babystep
+  #define BABYSTEP_MULTIPLICATOR_Z  5       // (steps or mm) Steps or millimeter distance for each Z babystep
   #define BABYSTEP_MULTIPLICATOR_XY 1       // (steps or mm) Steps or millimeter distance for each XY babystep
 
   #define DOUBLECLICK_FOR_Z_BABYSTEPPING  // Double-click on the Status Screen for Z Babystepping.
@@ -2253,7 +2260,11 @@
   #define BLOCK_BUFFER_SIZE  8
 #elif ENABLED(SDSUPPORT)
     #if ENABLED(OptimizeForOctoPi)
-    #define BLOCK_BUFFER_SIZE 32
+      #if ENABLED(SKR20)
+        #define BLOCK_BUFFER_SIZE 64
+      #else
+        #define BLOCK_BUFFER_SIZE 32
+      #endif
   #else
     #define BLOCK_BUFFER_SIZE 16
   #endif
@@ -2270,7 +2281,11 @@
 // The ASCII buffer for serial input
 #define MAX_CMD_SIZE 96
 #if ENABLED(OptimizeForOctoPi)
-  #define BUFSIZE 16
+  #if ENABLED(SKR20)
+    #define BUFSIZE 128
+  #else
+    #define BUFSIZE 16
+  #endif
 #else
   #define BUFSIZE 4
 #endif
@@ -2283,7 +2298,11 @@
 // Other output doesn't need to be that speedy.
 // :[0, 2, 4, 8, 16, 32, 64, 128, 256]
   #if ENABLED(OptimizeForOctoPi) && DISABLED(SKRMiniE3V2)
-    #define TX_BUFFER_SIZE 64
+    #if ENABLED(SKR20)
+      #define TX_BUFFER_SIZE 128
+    #else
+      #define TX_BUFFER_SIZE 64
+    #endif
   #elif DISABLED(OptimizeForOctoPi) && DISABLED(SKRMiniE3V2)
     #define TX_BUFFER_SIZE 32
   #elif
