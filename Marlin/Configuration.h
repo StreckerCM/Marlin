@@ -120,22 +120,38 @@
 #define MeshExtreme
 
 /*
+   @Build Section - Probe Options
+*/
+
+//#define ProbingFast         // Probes 1x per sequence
+//#define ProbingStd          // Probes 2x per sequence
+#define ProbingFine         // Probes 3x per sequence
+//#define ProbingExtreme      // Probes 5x per sequence
+
+
+//#define ProbingFansOff
+//#define ProbingHeatersOff
+//#define ProbingSteppersOff
+
+//#define ProbingDelay        // 200 (ms) To prevent vibrations from triggering piezo sensors
+
+/*
    @Build Section - Screen
 */
 
-//#define OrigLCD // Upgraded mainboard with single cable Ender LCD
-//#define GraphicLCD // 12864 Full graphics LCD for Ender 4, CR-X, Ender 5 Plus, CR10SPro, or CR10Max
-#define TFT_Screen //Bigtreetech TFT screen
-//#define Big_UI // Lightweight status screen, saves CPU cycles
+//#define OrigLCD             // Upgraded mainboard with single cable Ender LCD
+//#define GraphicLCD          // 12864 Full graphics LCD for Ender 4, CR-X, Ender 5 Plus, CR10SPro, or CR10Max
+#define TFT_Screen          // Bigtreetech TFT screen
+//#define Big_UI              // Lightweight status screen, saves CPU cycles
 
 /*
    @Build Section - Filiment Runout
 */
 
-//#define AddonFilSensor //Adds a filament runout sensor to the CR20 or Ender 4
-//#define lerdgeFilSensor //Using lerdge filament sensor, which is opposite polarity to stock
-//#define DualFilSensors //Using dual filament sensors on XMax and YMAX
-#define FilamentEncoder //Using filamet jam sensor such as the Bigtreetech Encoder wheel
+//#define AddonFilSensor      //Adds a filament runout sensor to the CR20 or Ender 4
+//#define lerdgeFilSensor     //Using lerdge filament sensor, which is opposite polarity to stock
+//#define DualFilSensors      //Using dual filament sensors on XMax and YMAX
+#define FilamentEncoder     //Using filamet jam sensor such as the Bigtreetech Encoder wheel
 
 /*
    @Build Section - Stepper Motor Options
@@ -143,12 +159,12 @@
 
 #define SKR_2209
 //#define SKR_2130
-#define SKR_UART // Configure SKR board with drivers in UART mode or SPI for TMC2130
-//#define SKR_ReverseSteppers // Some users reported directions backwards than others on SKR with various drivers.
-#define DualZ // Uses 5th driver on CRX or SKR boards as Z2
-#define TwoAmpY //Increase the Y motor current for a 2 Amp stepper
-//#define SensorlessHomingXY  // Enable sensorless homing for X and Y axis with StallGuard capable drivers only
-//#define Stepper09Deg // 0.9 degree per step motor on the extruder - doubles ESteps
+#define SKR_UART              // Configure SKR board with drivers in UART mode or SPI for TMC2130
+//#define SKR_ReverseSteppers   // Some users reported directions backwards than others on SKR with various drivers.
+#define DualZ                 // Uses 5th driver on CRX or SKR boards as Z2
+#define TwoAmpY               //Increase the Y motor current for a 2 Amp stepper
+//#define SensorlessHomingXY    // Enable sensorless homing for X and Y axis with StallGuard capable drivers only
+//#define Stepper09Deg          // 0.9 degree per step motor on the extruder - doubles ESteps
 
 /*
    @Build Section - Enclosure Controls
@@ -320,6 +336,14 @@
 
 #if ENABLED(E3DHemera)
  #define DirectDrive
+#endif
+
+#if DISABLED(ProbingHeatersOff) && ((ENABLED(ABL_EZABL) || ENABLED(ABL_NCSW)) && ENABLED(BED_AC)) 
+  #define ProbingHeatersOff
+#endif
+
+#if DISABLED(ProbingFansOff) && ENABLED(ABL_BLTOUCH)
+  #define ProbingFansOff
 #endif
 
 //===========================================================================
@@ -861,7 +885,7 @@
 // Use temp sensor 1 as a redundant sensor with sensor 0. If the readings
 // from the two sensors differ too much the print will be aborted.
 //#define TEMP_SENSOR_1_AS_REDUNDANT
-#define MAX_REDUNDANT_TEMP_SENSOR_DIFF 10
+#define TEMP_SENSOR_REDUNDANT_MAX_DIFF 10
 
 #define TEMP_RESIDENCY_TIME          2  // (seconds) Time to wait for hotend to "settle" in M109
 #if ENABLED(UnstableTemps)
@@ -1862,7 +1886,18 @@
  * A total of 2 does fast/slow probes with a weighted average.
  * A total of 3 or more adds more slow probes, taking the average.
  */
-#define MULTIPLE_PROBING 2
+#if ENABLED(ProbingFast)
+  #define ProbingCount 1
+#elif ENABLED(ProbingFine)
+  #define ProbingCount 3
+#elif ENABLED(ProbingExtreme)
+  #define ProbingCount 5
+#else
+  #define ProbingCount 2
+#endif
+
+#define MULTIPLE_PROBING ProbingCount
+
 //#define EXTRA_PROBING    1
 
 /**
@@ -1915,18 +1950,25 @@
  * These options are most useful for the BLTouch probe, but may also improve
  * readings with inductive probes and piezo sensors.
  */
-#if ((ENABLED(ABL_EZABL) || ENABLED(ABL_NCSW)) && ENABLED(BED_AC)) 
+#if ENABLED(ProbingHeatersOff) 
   #define PROBING_HEATERS_OFF       // Turn heaters off when probing
 #endif
 
 #if ENABLED(PROBING_HEATERS_OFF)
-  //#define WAIT_FOR_BED_HEATER     // Wait for bed to heat back up between probes (to improve accuracy)
+  #define WAIT_FOR_BED_HEATER     // Wait for bed to heat back up between probes (to improve accuracy)
   //#define WAIT_FOR_HOTEND         // Wait for hotend to heat back up between probes (to improve accuracy & prevent cold extrude)
 #endif
-#if ENABLED(ABL_BLTOUCH)
-  #define PROBING_FANS_OFF          // Turn fans off when probing
-  //#define PROBING_STEPPERS_OFF      // Turn steppers off (unless needed to hold position) when probing
-  //#define DELAY_BEFORE_PROBING 200  // (ms) To prevent vibrations from triggering piezo sensors
+
+#if ENABLED(ProbingFansOff)
+  #define PROBING_FANS_OFF            // Turn fans off when probing
+#endif
+
+#if ENABLED(ProbingSteppersOff)
+  #define PROBING_STEPPERS_OFF      // Turn steppers off (unless needed to hold position) when probing
+#endif
+
+#if ENABLED(ProbingDelay)
+  #define DELAY_BEFORE_PROBING 200  // (ms) To prevent vibrations from triggering piezo sensors
 #endif
 
 // Require minimum nozzle and/or bed temperature for probing
