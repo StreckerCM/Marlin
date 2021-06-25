@@ -277,7 +277,7 @@
    * and/or decrease WATCH_TEMP_INCREASE. WATCH_TEMP_INCREASE should not be set
    * below 2.
    */
-  #define WATCH_TEMP_PERIOD 50                // Seconds
+  #define WATCH_TEMP_PERIOD 60                // Seconds
   #define WATCH_TEMP_INCREASE 2               // Degrees Celsius
 #endif
 
@@ -907,7 +907,9 @@
    * V3.1: Force a probe with unknown mode into selected mode at Marlin startup ( = Probe EEPROM write )
    * To preserve the life of the probe, use this once then turn it off and re-flash.
    */
-  //#define BLTOUCH_FORCE_MODE_SET
+  #if ENABLED(SKR20)
+    #define BLTOUCH_FORCE_MODE_SET
+  #endif
 
   /**
    * Use "HIGH SPEED" mode for probing.
@@ -1383,9 +1385,9 @@
 #endif
 
 #if EITHER(SDSUPPORT, LCD_SET_PROGRESS_MANUALLY) && ANY(HAS_MARLINUI_U8GLIB, HAS_MARLINUI_HD44780, IS_TFTGLCD_PANEL, EXTENSIBLE_UI)
-  //#define SHOW_REMAINING_TIME       // Display estimated time to completion
+  #define SHOW_REMAINING_TIME       // Display estimated time to completion
   #if ENABLED(SHOW_REMAINING_TIME)
-    //#define USE_M73_REMAINING_TIME  // Use remaining time from M73 command instead of estimation
+    #define USE_M73_REMAINING_TIME  // Use remaining time from M73 command instead of estimation
     //#define ROTATE_PROGRESS_DISPLAY // Display (P)rogress, (E)lapsed, and (R)emaining time
   #endif
 
@@ -1419,7 +1421,9 @@
 
   // The standard SD detect circuit reads LOW when media is inserted and HIGH when empty.
   // Enable this option and set to HIGH if your SD cards are incorrectly detected.
-  //#define SD_DETECT_STATE HIGH
+  #if NONE(SKR14, SKR14Turbo, SKR20)
+    #define SD_DETECT_STATE HIGH
+  #endif
 
   //#define SD_IGNORE_AT_STARTUP            // Don't mount the SD card when starting up
   //#define SDCARD_READONLY                 // Read-only SD card (to save over 2K of flash)
@@ -1628,7 +1632,9 @@
    *
    * :[ 'LCD', 'ONBOARD', 'CUSTOM_CABLE' ]
    */
-  #define SDCARD_CONNECTION ONBOARD
+  #if ANY(SKR13, SKR14, SKR14Turbo, SKR20, SKRPRO11)
+    #define SDCARD_CONNECTION ONBOARD
+  #endif
 
   // Enable if SD detect is rendered useless (e.g., by using an SD extender)
   //#define NO_SD_DETECT
@@ -1666,7 +1672,7 @@
  */
 #if HAS_MARLINUI_U8GLIB
   // Show SD percentage next to the progress bar
-  //#define DOGM_SD_PERCENT
+  #define DOGM_SD_PERCENT
 
   // Save many cycles by drawing a hollow frame or no frame on the Info Screen
   //#define XYZ_NO_FRAME
@@ -1677,7 +1683,9 @@
 
   // A bigger font is available for edit items. Costs 3120 bytes of PROGMEM.
   // Western only. Not available for Cyrillic, Kana, Turkish, Greek, or Chinese.
-  #define USE_BIG_EDIT_FONT
+  #if ANY(SKR13, SKR14, SKR14Turbo, SKR20, SKRPRO11)
+    #define USE_BIG_EDIT_FONT
+  #endif
 
   // A smaller font may be used on the Info Screen. Costs 2434 bytes of PROGMEM.
   // Western only. Not available for Cyrillic, Kana, Turkish, Greek, or Chinese.
@@ -1962,9 +1970,24 @@
   #define BABYSTEP_ALWAYS_AVAILABLE       // Allow babystepping at all times (not just during movement).
   //#define BABYSTEP_XY                     // Also enable X/Y Babystepping. Not supported on DELTA!
   #define BABYSTEP_INVERT_Z false           // Change if Z babysteps should go the other way
-  //#define BABYSTEP_MILLIMETER_UNITS       // Specify BABYSTEP_MULTIPLICATOR_(XY|Z) in mm instead of micro-steps
-  #define BABYSTEP_MULTIPLICATOR_Z  5       // (steps or mm) Steps or millimeter distance for each Z babystep
-  #define BABYSTEP_MULTIPLICATOR_XY 1       // (steps or mm) Steps or millimeter distance for each XY babystep
+  
+  #if ANY()
+    #define BABYSTEP_MILLIMETER_UNITS       // Specify BABYSTEP_MULTIPLICATOR_(XY|Z) in mm instead of micro-steps
+  #endif
+
+  #if ENABLED(BabystepStd)
+    #define BABYSTEP_MULTIPLICATOR_Z  0.02    // (steps or mm) Steps or millimeter distance for each Z babystep
+    #define BABYSTEP_MULTIPLICATOR_XY 0.0125  // (steps or mm) Steps or millimeter distance for each XY babystep
+  #elif ENABLED(BabystepFine)
+    #define BABYSTEP_MULTIPLICATOR_Z  0.01    // (steps or mm) Steps or millimeter distance for each Z babystep
+    #define BABYSTEP_MULTIPLICATOR_XY 0.0125  // (steps or mm) Steps or millimeter distance for each XY babystep
+  #elif ENABLED(BabystepExtreme)
+    #define BABYSTEP_MULTIPLICATOR_Z  0.005   // (steps or mm) Steps or millimeter distance for each Z babystep
+    #define BABYSTEP_MULTIPLICATOR_XY 0.0125  // (steps or mm) Steps or millimeter distance for each XY babystep
+  #else
+    #define BABYSTEP_MULTIPLICATOR_Z  10       // (steps or mm) Steps or millimeter distance for each Z babystep
+    #define BABYSTEP_MULTIPLICATOR_XY 1       // (steps or mm) Steps or millimeter distance for each XY babystep
+  #endif
 
   #define DOUBLECLICK_FOR_Z_BABYSTEPPING  // Double-click on the Status Screen for Z Babystepping.
   #if ENABLED(DOUBLECLICK_FOR_Z_BABYSTEPPING)
@@ -2260,36 +2283,22 @@
 
 // The number of linear moves that can be in the planner at once.
 // The value of BLOCK_BUFFER_SIZE must be a power of 2 (e.g., 8, 16, 32)
-#if BOTH(SDSUPPORT, DIRECT_STEPPING)
-  #define BLOCK_BUFFER_SIZE  8
-#elif ENABLED(SDSUPPORT)
-    #if ENABLED(OptimizeForOctoPi)
-      #if ENABLED(SKR20)
-        #define BLOCK_BUFFER_SIZE 64
-      #else
-        #define BLOCK_BUFFER_SIZE 32
-      #endif
-  #else
-    #define BLOCK_BUFFER_SIZE 16
-  #endif
+#if ANY(SKR13, SKR14, SKR14Turbo, SKRPRO11)
+  #define BLOCK_BUFFER_SIZE 16
+#elif ENABLED(SKR20)
+  #define BLOCK_BUFFER_SIZE 32
 #else
-    #if ENABLED(OptimizeForOctoPi)
-    #define BLOCK_BUFFER_SIZE 32
-  #else
-    #define BLOCK_BUFFER_SIZE 16
-  #endif
+  #define BLOCK_BUFFER_SIZE 8
 #endif
 
 // @section serial
 
 // The ASCII buffer for serial input
 #define MAX_CMD_SIZE 96
-#if ENABLED(OptimizeForOctoPi)
-  #if ENABLED(SKR20)
-    #define BUFSIZE 128
-  #else
-    #define BUFSIZE 16
-  #endif
+#if ANY(SKRMiniE3V2) 
+  #define BUFSIZE 16
+#elif ANY(SKR13, SKR14, SKR20, SKR14Turbo, SKRPRO11)
+  #define BUFSIZE 8
 #else
   #define BUFSIZE 4
 #endif
@@ -2301,17 +2310,11 @@
 // For debug-echo: 128 bytes for the optimal speed.
 // Other output doesn't need to be that speedy.
 // :[0, 2, 4, 8, 16, 32, 64, 128, 256]
-  #if ENABLED(OptimizeForOctoPi) && DISABLED(SKRMiniE3V2)
-    #if ENABLED(SKR20)
-      #define TX_BUFFER_SIZE 128
-    #else
-      #define TX_BUFFER_SIZE 64
-    #endif
-  #elif DISABLED(OptimizeForOctoPi) && DISABLED(SKRMiniE3V2)
-    #define TX_BUFFER_SIZE 32
-  #elif
-    #define TX_BUFFER_SIZE 0
-  #endif
+#if ANY(SKR13, SKR14, SKR14Turbo, SKR20, SKRPRO11)
+  #define TX_BUFFER_SIZE 32
+#else
+  #define TX_BUFFER_SIZE 0
+#endif
 
 // Host Receive Buffer Size
 // Without XON/XOFF flow control (see SERIAL_XON_XOFF below) 32 bytes should be enough.
@@ -2349,7 +2352,7 @@
  * Currently handles M108, M112, M410, M876
  * NOTE: Not yet implemented for all platforms.
  */
-#if DISABLED(SKRMiniE3V2)
+#if NONE(SKRPRO11, SKRMiniE3V2)
   #define EMERGENCY_PARSER
 #endif
 
@@ -2544,13 +2547,15 @@
   #define PAUSE_PARK_RETRACT_FEEDRATE         60  // (mm/s) Initial retract feedrate.
   #define PAUSE_PARK_RETRACT_LENGTH            4  // (mm) Initial retract.
                                                   // This short retract is done immediately, before parking the nozzle.
-  #if ANY(MachineCR10SPro, MachineCR10SProV2, MachineCR10Max)
+  #if ANY(MachineCR10SPro, MachineCR10SProV2, MachineCR10Max, MachineEnder6)
     #define FILAMENT_CHANGE_UNLOAD_FEEDRATE     20  // (mm/s) Unload filament feedrate. This can be pretty fast.
   #else
     #define FILAMENT_CHANGE_UNLOAD_FEEDRATE     40  // (mm/s) Unload filament feedrate. This can be pretty fast.
   #endif
+
   #define FILAMENT_CHANGE_UNLOAD_ACCEL        25  // (mm/s^2) Lower acceleration may allow a faster feedrate.
-  #if ANY(MachineEnder5Plus, MachineCR10SPro, MachineCR10SProV2)
+
+  #if ANY(MachineCR10SPro, MachineCR10SProV2, MachineEnder6)
     #define FILAMENT_CHANGE_UNLOAD_LENGTH      75
   #elif ENABLED(DirectDrive)
     #define FILAMENT_CHANGE_UNLOAD_LENGTH      125
@@ -2568,15 +2573,7 @@
   #define FILAMENT_CHANGE_FAST_LOAD_FEEDRATE  20  // (mm/s) Load filament feedrate. This can be pretty fast.
   #define FILAMENT_CHANGE_FAST_LOAD_ACCEL     15  // (mm/s^2) Lower acceleration may allow a faster feedrate.
 
-  #if ENABLED(DirectDrive)
-    #define FILAMENT_CHANGE_FAST_LOAD_LENGTH   100
-  #elif(ENABLED(MachineCRX))
-    #define FILAMENT_CHANGE_FAST_LOAD_LENGTH   450  // (mm) Load length of filament, from extruder gear to nozzle.
-  #elif ANY(MachineEnder5Plus, MachineCR10Max, MachineCR10S4, MachineCR10S5)
-    #define FILAMENT_CHANGE_FAST_LOAD_LENGTH   600
-  #else
-    #define FILAMENT_CHANGE_FAST_LOAD_LENGTH   430  // (mm) Load length of filament, from extruder gear to nozzle.
-  #endif
+  #define FILAMENT_CHANGE_FAST_LOAD_LENGTH   FILAMENT_CHANGE_UNLOAD_LENGTH  // (mm) Load length of filament, from extruder gear to nozzle.
                                                   //   For Bowden, the full length of the tube and nozzle.
                                                   //   For direct drive, the full length of the nozzle.
   //#define ADVANCED_PAUSE_CONTINUOUS_PURGE       // Purge continuously up to the purge length until interrupted.
@@ -3103,7 +3100,7 @@
   #define I_HYBRID_THRESHOLD       3
   #define J_HYBRID_THRESHOLD       3
   #define K_HYBRID_THRESHOLD       3
-  #define E0_HYBRID_THRESHOLD     50
+  #define E0_HYBRID_THRESHOLD     30
   #define E1_HYBRID_THRESHOLD     30
   #define E2_HYBRID_THRESHOLD     30
   #define E3_HYBRID_THRESHOLD     30

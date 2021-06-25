@@ -28,7 +28,14 @@
 /**
  * Marlin release version identifier
  */
-#define SHORT_BUILD_VERSION "2.0.8_BTT_BF_1.13"
+#define SHORT_BUILD_VERSION "2.0.8_BTT_BF_1.15"
+
+/**
+ * The STRING_DISTRIBUTION_DATE represents when the binary file was built,
+ * here we define this default string as the date where the latest release
+ * version was tagged.
+ */
+#define STRING_DISTRIBUTION_DATE "2021-06-25"
 
 /**
  * Verbose version identifier which should contain a reference to the location
@@ -108,12 +115,6 @@
 
 #define DETAILED_BUILD_VERSION SHORT_BUILD_VERSION " CMS " VerChar1 VerChar2 VerChar3 VerChar4 VerChar5 VerChar6
 
-/**
- * The STRING_DISTRIBUTION_DATE represents when the binary file was built,
- * here we define this default string as the date where the latest release
- * version was tagged.
- */
-#define STRING_DISTRIBUTION_DATE "2021-06-15"
 
 /**
  * Defines a generic printer name to be output to the LCD after booting Marlin.

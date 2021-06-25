@@ -120,6 +120,14 @@
 #define MeshExtreme
 
 /*
+   @Build Section - Z babystepping Options
+*/
+
+//#define BabystepStd         // Babystepps .02mm
+//#define BabystepFine        // Babystepps .01mm
+#define BabystepExtreme       // Babystepps .005mm
+
+/*
    @Build Section - Probe Options
 */
 
@@ -159,6 +167,8 @@
 
 #define SKR_2209
 //#define SKR_2130
+//#define SKR_2225
+//#define SKR_2226
 #define SKR_UART              // Configure SKR board with drivers in UART mode or SPI for TMC2130
 //#define SKR_ReverseSteppers   // Some users reported directions backwards than others on SKR with various drivers.
 #define DualZ                 // Uses 5th driver on CRX or SKR boards as Z2
@@ -1306,7 +1316,7 @@
  *          TMC5130, TMC5130_STANDALONE, TMC5160, TMC5160_STANDALONE
  * :['A4988', 'A5984', 'DRV8825', 'LV8729', 'L6470', 'L6474', 'POWERSTEP01', 'TB6560', 'TB6600', 'TMC2100', 'TMC2130', 'TMC2130_STANDALONE', 'TMC2160', 'TMC2160_STANDALONE', 'TMC2208', 'TMC2208_STANDALONE', 'TMC2209', 'TMC2209_STANDALONE', 'TMC26X', 'TMC26X_STANDALONE', 'TMC2660', 'TMC2660_STANDALONE', 'TMC5130', 'TMC5130_STANDALONE', 'TMC5160', 'TMC5160_STANDALONE']
  */
- #if ENABLED(SKR_2209)
+ #if ANY(SKR_2209, SKR_2226)
     #define X_DRIVER_TYPE  TMC2209
     #define Y_DRIVER_TYPE  TMC2209
     #define Z_DRIVER_TYPE  TMC2209
@@ -1926,7 +1936,7 @@
   #define Z_AFTER_PROBING           5 // Z position after probing is done
 #endif
 
-#define Z_PROBE_LOW_POINT          -3 // Farthest distance below the trigger-point to go before stopping
+#define Z_PROBE_LOW_POINT          -4 // Farthest distance below the trigger-point to go before stopping
 
 // For M851 give a range for adjusting the Z probe offset
 #define Z_PROBE_OFFSET_RANGE_MIN -9
@@ -1956,7 +1966,7 @@
 
 #if ENABLED(PROBING_HEATERS_OFF)
   #define WAIT_FOR_BED_HEATER     // Wait for bed to heat back up between probes (to improve accuracy)
-  //#define WAIT_FOR_HOTEND         // Wait for hotend to heat back up between probes (to improve accuracy & prevent cold extrude)
+  #define WAIT_FOR_HOTEND         // Wait for hotend to heat back up between probes (to improve accuracy & prevent cold extrude)
 #endif
 
 #if ENABLED(ProbingFansOff)
@@ -2190,7 +2200,7 @@
     #define Y_MAX_POS 310
     #define ClipClearance 5
   #elif ENABLED(MachineCR10SPro)
-    #define X_BED_SIZE 300
+    #define X_BED_SIZE 310
     #define Y_BED_SIZE 300
     #if ENABLED(KitFunssor_CR10S_Pro_Y_Axis)
       #define Z_MAX_POS 385
@@ -2198,7 +2208,7 @@
       #define Z_MAX_POS 400
     #endif
     #if ENABLED(Kit3DFused_CR10_X_Axis)
-      #define X_MAX_POS 470
+      #define X_MAX_POS 365
     #else
       #define X_MAX_POS 315
     #endif
