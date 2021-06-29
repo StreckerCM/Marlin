@@ -28,14 +28,14 @@
 /**
  * Marlin release version identifier
  */
-#define SHORT_BUILD_VERSION "2.0.8_BTT_BF_1.15"
+#define SHORT_BUILD_VERSION "2.0.8_BTT_BF_1.17"
 
 /**
  * The STRING_DISTRIBUTION_DATE represents when the binary file was built,
  * here we define this default string as the date where the latest release
  * version was tagged.
  */
-#define STRING_DISTRIBUTION_DATE "2021-06-25"
+#define STRING_DISTRIBUTION_DATE "2021-06-29"
 
 /**
  * Verbose version identifier which should contain a reference to the location

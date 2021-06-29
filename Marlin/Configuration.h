@@ -2201,7 +2201,7 @@
     #define ClipClearance 5
   #elif ENABLED(MachineCR10SPro)
     #define X_BED_SIZE 310
-    #define Y_BED_SIZE 300
+    #define Y_BED_SIZE 310
     #if ENABLED(KitFunssor_CR10S_Pro_Y_Axis)
       #define Z_MAX_POS 385
     #else
