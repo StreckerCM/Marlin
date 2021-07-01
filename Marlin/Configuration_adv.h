@@ -907,9 +907,9 @@
    * V3.1: Force a probe with unknown mode into selected mode at Marlin startup ( = Probe EEPROM write )
    * To preserve the life of the probe, use this once then turn it off and re-flash.
    */
-  #if ENABLED(SKR20)
-    #define BLTOUCH_FORCE_MODE_SET
-  #endif
+  
+  //#define BLTOUCH_FORCE_MODE_SET
+  
 
   /**
    * Use "HIGH SPEED" mode for probing.
@@ -917,7 +917,7 @@
    * This feature was designed for Deltabots with very fast Z moves; however, higher speed Cartesians
    * might be able to use it. If the machine can't raise Z fast enough the BLTouch may go into ALARM.
    */
-  //#define BLTOUCH_HS_MODE
+   //#define BLTOUCH_HS_MODE
 
   // Safety: Enable voltage mode settings in the LCD menu.
   //#define BLTOUCH_LCD_VOLTAGE_MENU
@@ -2755,7 +2755,7 @@
     #define STEPPER_Y_CURRENT     800 
   #endif
 
-  #define HOLD_MULTIPLIER    0.3  // Scales down the holding current from run current
+  #define HOLD_MULTIPLIER    0.5  // Scales down the holding current from run current
 
   /**
    * Interpolate microsteps to 256
