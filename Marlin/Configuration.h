@@ -175,6 +175,7 @@
 #define TwoAmpY               //Increase the Y motor current for a 2 Amp stepper
 //#define SensorlessHomingXY    // Enable sensorless homing for X and Y axis with StallGuard capable drivers only
 //#define Stepper09Deg          // 0.9 degree per step motor on the extruder - doubles ESteps
+#define zSyncInstalled
 
 /*
    @Build Section - Enclosure Controls
@@ -2200,8 +2201,8 @@
     #define Y_MAX_POS 310
     #define ClipClearance 5
   #elif ENABLED(MachineCR10SPro)
-    #define X_BED_SIZE 310
-    #define Y_BED_SIZE 310
+    #define X_BED_SIZE 300
+    #define Y_BED_SIZE 300
     #if ENABLED(KitFunssor_CR10S_Pro_Y_Axis)
       #define Z_MAX_POS 385
     #else
@@ -2288,7 +2289,9 @@
   #define X_MIN_POS 0
   #define Y_MIN_POS 0
 #endif
+
 #define Z_MIN_POS 0
+
 #ifndef X_MAX_POS
   #define X_MAX_POS X_BED_SIZE
 #endif
@@ -2561,7 +2564,7 @@
 #elif ENABLED( MeshFine)
   #define GRID_MAX_POINTS_X 8
 #elif ENABLED(MeshExtreme)
-  #define GRID_MAX_POINTS_X 15
+  #define GRID_MAX_POINTS_X 10
 #else
   #define GRID_MAX_POINTS_X 3
 #endif

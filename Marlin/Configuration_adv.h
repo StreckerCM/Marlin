@@ -3904,7 +3904,7 @@
  */
 //#define STARTUP_COMMANDS "M17 Z"
 #if DISABLED(OptimizeForOctoPi)
-  #if ENABLED(DualZ)
+  #if ENABLED(DualZ) && DISABLED(zSyncInstalled)
     //Auto Z Stepper Align
     #define STARTUP_COMMANDS "G34"
   #else
@@ -3950,7 +3950,7 @@
     #define CommBedTmp "75"
   #endif
 
-  #if ENABLED(DualZ)
+  #if ENABLED(DualZ) && DISABLED(zSyncInstalled)
     #define DualZComm "\nG34I8"
   #else
     #define DualZComm ""
