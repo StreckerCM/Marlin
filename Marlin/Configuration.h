@@ -2850,19 +2850,19 @@
 #define PREHEAT_1_TEMP_HOTEND 210
 #define PREHEAT_1_TEMP_BED     60
 #define PREHEAT_1_FAN_SPEED     0 // Value from 0 to 255
-#define PREHEAT_1_MESH_STORE    1 
+#define PREHEAT_1_MESH_STORE    0 
 
 #define PREHEAT_2_LABEL       "PETG"
 #define PREHEAT_2_TEMP_HOTEND 240
 #define PREHEAT_2_TEMP_BED     70
 #define PREHEAT_2_FAN_SPEED     0 // Value from 0 to 255
-#define PREHEAT_2_MESH_STORE    2 
+#define PREHEAT_2_MESH_STORE    1 
 
 #define PREHEAT_3_LABEL       "ABS"
 #define PREHEAT_3_TEMP_HOTEND 245
 #define PREHEAT_3_TEMP_BED    110
 #define PREHEAT_3_FAN_SPEED     0 // Value from 0 to 255
-#define PREHEAT_3_MESH_STORE    3 
+#define PREHEAT_3_MESH_STORE    2 
 
 /**
  * Nozzle Park

@@ -3970,7 +3970,9 @@
 
   #define MAIN_MENU_ITEM_3_DESC "Z Steppers Align"
   #define MAIN_MENU_ITEM_3_GCODE "\nG34\nG28 X0"
-  //#define MAIN_MENU_ITEM_3_CONFIRM          // Show a confirmation dialog before this action
+  #if ENABLED(zSyncInstalled)
+    #define MAIN_MENU_ITEM_3_CONFIRM          // Show a confirmation dialog before this action
+  #endif
 
   #define MAIN_MENU_ITEM_4_DESC PREHEAT_1_LABEL " Tune End" 
   #define MAIN_MENU_ITEM_4_GCODE "M106S255\nM303C8S" STRINGIFY(PREHEAT_1_TEMP_HOTEND) "E0U\nM500\nM107\nM117 End PID Tune Done"
