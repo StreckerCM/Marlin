@@ -28,7 +28,7 @@
 /**
  * Marlin release version identifier
  */
-#define SHORT_BUILD_VERSION "2.0.8_BTT_BF_1.21"
+#define SHORT_BUILD_VERSION "2.0.8_BTT_BF_1.22"
 
 /**
  * The STRING_DISTRIBUTION_DATE represents when the binary file was built,

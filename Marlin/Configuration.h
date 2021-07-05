@@ -2213,7 +2213,7 @@
     #else
       #define X_MAX_POS 315
     #endif
-    #define Y_MAX_POS 310
+    #define Y_MAX_POS 301.5
     #define ClipClearance 10
   #elif ENABLED(MachineCR10Std)
     #define X_BED_SIZE 300
@@ -2277,6 +2277,9 @@
 #elif ENABLED(MachineHICTOPi3)
   #define X_MIN_POS 0
   #define Y_MIN_POS -13
+#elif ANY(MachineCR10SPro, MachineCR10SProV2)
+  #define X_MIN_POS -1.5
+  #define Y_MIN_POS -8.5
 // #elif ANY(MachineCR10SPro, MachineCR10SProV2)
 //     #if ENABLED(KitFunssor_CR10S_Pro_Y_Axis)
 //       #define X_MIN_POS 0
@@ -2608,7 +2611,7 @@
     #define MESH_EDIT_GFX_OVERLAY   // Display a graphics overlay while editing the mesh
   #endif
 
-  #define MESH_INSET 1              // Set Mesh bounds as an inset region of the bed
+  #define MESH_INSET ClipClearance             // Set Mesh bounds as an inset region of the bed
   //#define GRID_MAX_POINTS_X 10      // Don't use more than 15 points per axis, implementation limited.
   //#define GRID_MAX_POINTS_Y GRID_MAX_POINTS_X
 
